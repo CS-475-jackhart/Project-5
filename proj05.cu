@@ -140,23 +140,23 @@ __global__ void MonteCarlo(
 	OUT int *dsuccesses
 ){
 
-  //unsigned int numItems = blockDim.x;
-  //unsigned int wgNum    = blockIdx.x;
-  //unsigned int tnum     = threadIdx.x;
-  unsigned int gid      = blockIdx.x*blockDim.x + threadIdx.x;
+	//unsigned int numItems = blockDim.x;
+	//unsigned int wgNum    = blockIdx.x;
+	//unsigned int tnum     = threadIdx.x;
+	unsigned int gid      = blockIdx.x*blockDim.x + threadIdx.x;
 
-  dsuccesses[gid] = 0;
+	dsuccesses[gid] = 0;
 
 	// randomize everything:
 	?????
 
-	?????
-	if(?????) {
-		?????
-		if(?????) {
-			?????
-			if(?????)
-        dsuccesses[gid] = 1;
+	float da = Length(PinAx-dholeaxs[gid], PinAy-dholeays[gid]);
+	if((da + PinAr) <= dholears[gid]) {
+		float db = Length(PinBx-dholebxs[gid], PinBy-dholebys[gid]);
+		if((db + PinBr) <= dholebrs[gid]) {
+			float dc = Length(PinCx-dholecxs[gid], PinBy-dholebys[gid]);
+			if((dc + PinCr) <= dholecrs[gid])
+		dsuccesses[gid] = 1;
 		}
 	}
 }
@@ -180,60 +180,61 @@ int main(int argc, char *argv[]) {
 
 	int *hsuccesses = new int [NUMTRIALS];
 
-  // fill the random-value arrays:
-  for(int n = 0; n < NUMTRIALS; n++) {
-    hholeaxs[n] = Ranf(HoleAx-HoleAxPM, HoleAx+HoleAxPM);
-    hholeays[n] = Ranf(HoleAy-HoleAyPM, HoleAy+HoleAyPM);
-    hholears[n] = Ranf(HoleAr-HoleArPM, HoleAr+HoleArPM);
+	// fill the random-value arrays:
+	for(int n = 0; n < NUMTRIALS; n++) {
+		hholeaxs[n] = Ranf(HoleAx-HoleAxPM, HoleAx+HoleAxPM);
+		hholeays[n] = Ranf(HoleAy-HoleAyPM, HoleAy+HoleAyPM);
+		hholears[n] = Ranf(HoleAr-HoleArPM, HoleAr+HoleArPM);
 
-    hholebxs[n] = Ranf(HoleBx-HoleBxPM, HoleBx+HoleBxPM);
-    hholebys[n] = Ranf(HoleBy-HoleByPM, HoleBy+HoleByPM);
-    hholebrs[n] = Ranf(HoleBr-HoleBrPM, HoleBr+HoleBrPM);
+		hholebxs[n] = Ranf(HoleBx-HoleBxPM, HoleBx+HoleBxPM);
+		hholebys[n] = Ranf(HoleBy-HoleByPM, HoleBy+HoleByPM);
+		hholebrs[n] = Ranf(HoleBr-HoleBrPM, HoleBr+HoleBrPM);
 
-    hholecxs[n] = Ranf(HoleCx-HoleCxPM, HoleCx+HoleCxPM);
-    hholecys[n] = Ranf(HoleCy-HoleCyPM, HoleCy+HoleCyPM);
-    hholecrs[n] = Ranf(HoleCr-HoleCrPM, HoleCr+HoleCrPM);
-  }
+		hholecxs[n] = Ranf(HoleCx-HoleCxPM, HoleCx+HoleCxPM);
+		hholecys[n] = Ranf(HoleCy-HoleCyPM, HoleCy+HoleCyPM);
+		hholecrs[n] = Ranf(HoleCr-HoleCrPM, HoleCr+HoleCrPM);
+	}
 
-	// allocate device memory:
-  float *dholeaxs, *dholeays, *dholears;
-  float *dholebxs, *dholebys, *dholebrs;
-  float *dholecxs, *dholecys, *dholecrs;
-  int   *dsuccesses;
+		// allocate device memory:
+	float *dholeaxs, *dholeays, *dholears;
+	float *dholebxs, *dholebys, *dholebrs;
+	float *dholecxs, *dholecys, *dholecrs;
+	int   *dsuccesses;
 
 	// *********************************
 	// ***** be sure to use NUMTRIALS*sizeof(float) as the number of bytes to malloc, not sizeof(hholeaxs)  *****
 	// (because hholeaxs is a float *, its sizeof is only 8)
 	// *********************************
-	cudaMalloc(?????);
-	cudaMalloc(?????);
-	cudaMalloc(?????);
+	double malSize = NUMTRIALS*sizeof(float)
+	cudaMalloc((void**)&dholeaxs, malSize);
+	cudaMalloc((void**)&dholeays, malSize);
+	cudaMalloc((void**)&dholears, malSize);
 
-	cudaMalloc(?????);
-	cudaMalloc(?????);
-	cudaMalloc(?????);
+	cudaMalloc((void**)&dholebxs, malSize);
+	cudaMalloc((void**)&dholebys, malSize);
+	cudaMalloc((void**)&dholebrs, malSize);
 
-	cudaMalloc(?????);
-	cudaMalloc(?????);
-	cudaMalloc(?????);
+	cudaMalloc((void**)&dholecxs, malSize);
+	cudaMalloc((void**)&dholecys, malSize);
+	cudaMalloc((void**)&dholecrs, malSize);
 
-	cudaMalloc(?????);
+	cudaMalloc((void**)&dsuccesses, NUMTRIALS*sizeof(int));
 
 	CudaCheckError(1);
 
 
 	// copy host memory to the device:
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholeaxs, hholeaxs, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholeays, hholeays, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholears, hholears, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
 
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholebxs, hholebxs, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholebys, hholebys, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholebrs, hholebrs, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
 
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
-	cudaMemcpy(?????, ?????, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholecxs, hholecxs, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholecys, hholecys, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpy(dholecrs, hholecrs, NUMTRIALS*sizeof(float), cudaMemcpyHostToDevice);
 
 	CudaCheckError(2);
 
