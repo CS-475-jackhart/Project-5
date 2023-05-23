@@ -147,16 +147,13 @@ __global__ void MonteCarlo(
 
 	dsuccesses[gid] = 0;
 
-	// randomize everything:
-	?????
-
 	float da = Length(PinAx-dholeaxs[gid], PinAy-dholeays[gid]);
 	if((da + PinAr) <= dholears[gid]) {
 		float db = Length(PinBx-dholebxs[gid], PinBy-dholebys[gid]);
 		if((db + PinBr) <= dholebrs[gid]) {
 			float dc = Length(PinCx-dholecxs[gid], PinBy-dholebys[gid]);
 			if((dc + PinCr) <= dholecrs[gid])
-		dsuccesses[gid] = 1;
+				dsuccesses[gid] = 1;
 		}
 	}
 }
@@ -257,7 +254,12 @@ int main(int argc, char *argv[]) {
 	CudaCheckError(5);
 
 	// execute the kernel:
-	MonteCarlo<<< grid, threads >>>(?????);
+	MonteCarlo<<< grid, threads >>>(
+		dholeaxs,	dholeays,	dholears,
+		dholebxs,	dholebys,	dholebrs,
+		dholecxs,	dholecys,	dholecrs,
+		dsuccesses
+	);
 
 	// record the stop event:
 	cudaEventRecord(stop, NULL);
@@ -270,7 +272,7 @@ int main(int argc, char *argv[]) {
 	CudaCheckError(6);
 
 	// copy result from the device to the host:
-	cudaMemcpy(?????, ?????, NUMTRIALS *sizeof(int), cudaMemcpyDeviceToHost);
+	cudaMemcpy(hsuccesses, dsuccesses, NUMTRIALS *sizeof(int), cudaMemcpyDeviceToHost);
 	CudaCheckError(7);
 
 	// compute the sum :
