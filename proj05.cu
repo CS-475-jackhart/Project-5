@@ -25,7 +25,7 @@
 
 #define NUMBLOCKS	(NUMTRIALS / BLOCKSIZE)
 
-//#define CSV
+#define CSV
 
 // the pins; numbers are constants:
 #define PinAx	3.0f
@@ -43,7 +43,7 @@
 
 // ranges for the random numbers:
 
-#define PROJECT1
+//#define PROJECT1
 
 #ifdef PROJECT1
 const float HoleAx   =  2.90f;
@@ -151,9 +151,9 @@ __global__ void MonteCarlo(
 	if((da + PinAr) <= dholears[gid]) {
 		float db = Length(PinBx-dholebxs[gid], PinBy-dholebys[gid]);
 		if((db + PinBr) <= dholebrs[gid]) {
-			float dc = Length(PinCx-dholecxs[gid], PinBy-dholebys[gid]);
+			float dc = Length(PinCx-dholecxs[gid], PinCy-dholecys[gid]);
 			if((dc + PinCr) <= dholecrs[gid])
-				dsuccesses[gid] = 1;
+				dsuccesses[gid] += 1;
 		}
 	}
 }
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
 		hholecrs[n] = Ranf(HoleCr-HoleCrPM, HoleCr+HoleCrPM);
 	}
 
-		// allocate device memory:
+	// allocate device memory:
 	float *dholeaxs, *dholeays, *dholears;
 	float *dholebxs, *dholebys, *dholebrs;
 	float *dholecxs, *dholecys, *dholecrs;
