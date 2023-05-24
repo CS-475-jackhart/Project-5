@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 	// ***** be sure to use NUMTRIALS*sizeof(float) as the number of bytes to malloc, not sizeof(hholeaxs)  *****
 	// (because hholeaxs is a float *, its sizeof is only 8)
 	// *********************************
-	double malSize = NUMTRIALS*sizeof(float)
+	double malSize = NUMTRIALS*sizeof(float);
 	cudaMalloc((void**)&dholeaxs, malSize);
 	cudaMalloc((void**)&dholeays, malSize);
 	cudaMalloc((void**)&dholears, malSize);
